@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Delete {{event.title}}?</h2>
+
+<form action="" method="post">{% csrf_token %}
+  
+  <button type="submit" class="btn btn-danger btn-block mb-2">Yes, Confirm delete</button>
+</form>
+<a href="{% url 'event:event_detail' event.id %}">
+  <button type="submit" class="btn btn-success btn-block">No, Go back</button>
+</a>
+
+
+{% endblock %}

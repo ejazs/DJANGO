@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% load static %}
+
+
+{% block content %}
+<h2>Sorry, You are not authorized to access this page.</h2>
+<h4><a href="{% url 'ideas:dashboard' %}">Return to Home</a></h4>
+<img src="{% static "images/not_authorized.jpg" %}"  class="img-fluid" alt="My image">
+
+{% endblock %}

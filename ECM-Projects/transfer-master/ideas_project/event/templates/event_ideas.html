@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load markdown_deux_tags %}
+
+{% block content %}
+<div class="infinite-container">
+    <h2 class="">Event:
+        <a href="{% url 'event:event_detail' event.id %}">  
+            {{event.title}}
+        </a>
+    </h2>
+  <span class="ml-2">
+      <a href="{% url 'event:create_idea' event.id %}"><button class="btn btn-info btn-block">Create idea</button></a>
+    </span> <hr>
+  <nav class="nav nav-pills nav-justified mt-2 mb-4 ">
+      <a class="nav-item nav-link active ml-2 " href="{% url 'event:event_ideas' event.id %}">Panel</a>
+      <a class="nav-item nav-link active ml-2" href="{% url 'event:featured_event_ideas' event.id %}">Featured</a>
+      <a class="nav-item nav-link active ml-2" href="{% url 'event:trending_event_ideas' event.id %}">Trending</a>
+      <a class="nav-item nav-link active ml-2" style="background-color: #18BC9C;" href="{% url 'event:fresh_event_ideas' event.id %}">Fresh</a>
+    </nav>
+    <!-- <form class="mb-2" method="GET" >
+        <div class="form-group">
+          <input type="text" class="form-control" id="seacrh" name="q" placeholder="Search Fresh Events" value="{{request.GET.q}}">
+        </div>
+      
+        <button type="submit" class="btn btn-info btn-block">Search</button>
+      </form>
+      <hr> -->
+{% for idea in ideas %}
+
+<!-- <strong>{{idea.comment_set.count}} and {{idea.likes.count}}</strong> -->
+{% if  idea.comment_set.count < criteria.comment_criteria  or idea.likes.count < criteria.like_criteria %}
+<div class="card mb-4 infinite-item" >
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      <a href="{{idea.get_absolute_url}}">
+          <h4 class="card-title">{{idea.title}}</h4>
+         
+      </a>
+      <small class="mr-2">Posted by :<a href="{% url 'accounts:profile' idea.created_by  %}">
+           {{idea.created_by.first_name}} {{idea.created_by.last_name}}</small>
+           
+      </a> |
+      <small class="pull-center ml-2">Posted at : {{idea.created_at}}</small>
+       <hr>
+      <p class="card-text">{{idea.description|markdown|truncatewords:20 }}</p>
+      <!-- <a href="{{idea.get_absolute_url}}" class="btn btn-primary">Continue reading</a> -->
+      <hr>
+      <!-- <a href="{% url 'ideas:like' idea.slug %}"><i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i></a> -->
+      {% if is_active %} 
+      {% if user.is_authenticated %}
+      {% if user not in idea.likes.all %}
+      <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2">
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+        <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+        
+      </a>
+
+      {% else %}
+      <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2" style="color: #2196f3;">
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+        <i class="fa fa-thumbs-up mr-2" aria-hidden="true" >Liked</i>
+        
+      </a>
+
+      {% endif %} 
+      {% else %}
+      <a href="{% url 'ideas:like' idea.slug %}"  >
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+          <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+          
+        </a>
+      {% endif %} 
+      
+      <!-- <a href="#"><i class="fa fa-thumbs-down mr-2" aria-hidden="true">Unlike</i></a> -->
+
+      <a href="{{idea.get_absolute_url}}">
+          <span class="comment-count mr-1">{{idea.comment_set.count}}</span>
+        <i class="fa fa-comments fa-1x mr-2" aria-hidden="true"></i>
+        <b>Comments</b> 
+      </a>
+      {% else %}
+      {% if user.is_authenticated %}
+      {% if user not in idea.likes.all %}
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+        <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+        
+     
+
+      {% else %}
+      
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+        <i class="fa fa-thumbs-up mr-2" aria-hidden="true" >Liked</i>
+        
+     
+
+      {% endif %} 
+      {% else %}
+      
+          <span class="like-count mr-1">{{idea.likes.count}}</span>
+          <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+          
+       
+      {% endif %} 
+      
+      <!-- <a href="#"><i class="fa fa-thumbs-down mr-2" aria-hidden="true">Unlike</i></a> -->
+
+      <a href="{{idea.get_absolute_url}}">
+          <span class="comment-count mr-1">{{idea.comment_set.count}}</span>
+        <i class="fa fa-comments fa-1x mr-2" aria-hidden="true"></i>
+        <b>Comments</b> 
+      </a>
+      
+      {% endif %}
+      <!-- <a href="#"><i class="fa fa-comments fa-2x" aria-hidden="true"></i><b>Comments</b> </a> -->
+    </div>
+    
+  </div>
+  {% endif %}
+  {% empty %}
+    <h4>No Ideas in this category yet</h4>
+ 
+{% endfor %}
+
+</div> 
+{% if ideas.has_next %}
+<a class="infinite-more-link" href="?page={{ ideas.next_page_number }}">
+  <button class="btn btn-primary btn-block">More </button>
+</a>
+{% endif %}
+{% endblock content %}
+
+{% block js %}
+<script>
+all_imgs = $('.card-body img');
+all_imgs.each(function(){$(this).addClass('img-fluid')})
+</script>
+
+<script>
+
+
+$(document).ready(function(){
+
+$('body').on('click','.like-btn',like_toggle_js);
+
+
+
+})
+
+</script>
+<script>
+  myInfiniteScroll();
+</script>
+<!-- <script>
+    var infinite = new Waypoint.Infinite({
+      element: $('.infinite-container')[0],
+      onBeforePageLoad: function () {
+        $('.loading').show();
+      },
+      onAfterPageLoad: function ($items) {
+        $('.loading').hide();
+      }
+    });
+  </script>
+
+  <script>
+  $( document ).ajaxComplete(function() {
+  console.log( "Triggered ajaxComplete handler." );
+  all_imgs = $('.card-body img');
+all_imgs.each(function(){$(this).addClass('img-fluid')})
+});
+</script> -->
+
+
+{% endblock js %}

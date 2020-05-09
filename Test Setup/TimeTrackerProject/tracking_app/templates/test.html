@@ -1,0 +1,11 @@
+<ul>
+  {% for log in logs %}
+  <li>
+    {{log.app_name}}
+    {% for idle in log.idle_time %}
+    {{idle.idle_time}}
+    {% endfor %}
+    <hr>
+  </li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,159 @@
+{% extends 'base2.html' %}
+{% load markdown_deux_tags %}
+{% block content %}
+
+<div class="container">
+  {% include 'messages.html' %}
+  <div class="row">
+
+    <div class="col-md-8">
+      <h2>{{user.First}}</h2>
+      <div class="jumbotron">
+        <h1 class="display-3">
+          <img src="{{profile.profile_pic.url}}" class="rounded float-left mr-4" alt="...">
+          <h2>{{logged_user.first_name}} {{logged_user.last_name}}</h2>
+        </h1>
+        <hr class="my-4">
+        <p class="lead">{{profile.description}}</p>
+        <!-- <hr class="my-4">
+          <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+          <p class="lead">
+            <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+          </p> -->
+      </div>
+      <div class="user-ideas">
+        <h4> {{profile.user.first_name}}'s Ideas</h4>
+        <hr class="my-2">
+        <div class="infinite-container">
+          {% for idea in user_ideas %}
+          <div class="card mb-4 infinite-item">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="card-body">
+              <a href="{{idea.get_absolute_url}}">
+                <h4 class="card-title">{{idea.title}}</h4>
+
+              </a>
+              <small>Posted by :<a href="{% url 'accounts:profile' idea.created_by  %}">
+                  {{idea.created_by.first_name}} {{idea.created_by.last_name}}</small>
+              </a>
+              <hr>
+              <p class="card-text">{{idea.description|markdown|truncatewords:20 }}</p>
+              <!-- <a href="{{idea.get_absolute_url}}" class="btn btn-primary">Continue reading</a> -->
+              <hr>
+              <!-- <a href="{% url 'ideas:like' idea.slug %}"><i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i></a> -->
+              {% if user.is_authenticated %}
+              {% if user not in idea.likes.all %}
+              <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2">
+                <span class="like-count mr-1">{{idea.likes.count}}</span>
+                <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+
+              </a>
+
+              {% else %}
+              <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2" style="color: #2196f3;">
+                <span class="like-count mr-1">{{idea.likes.count}}</span>
+                <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Liked</i>
+
+              </a>
+
+              {% endif %}
+              {% else %}
+              <a href="{% url 'ideas:like' idea.slug %}">
+                <span class="like-count mr-1">{{idea.likes.count}}</span>
+                <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+
+              </a>
+              {% endif %}
+
+              <!-- <a href="#"><i class="fa fa-thumbs-down mr-2" aria-hidden="true">Unlike</i></a> -->
+
+              <a href="{{idea.get_absolute_url}}">
+                <span class="comment-count mr-1">{{idea.comment_set.count}}</span>
+                <i class="fa fa-comments fa-1x mr-2" aria-hidden="true"></i>
+                <b>Comments</b>
+              </a>
+
+              <!-- <a href="#"><i class="fa fa-comments fa-2x" aria-hidden="true"></i><b>Comments</b> </a> -->
+            </div>
+
+          </div>
+          {% endfor %}
+                 </div>
+
+ {% if user_ideas.has_next %}
+<a class="infinite-more-link" href="?page={{ user_ideas.next_page_number }}">More</a>
+{% endif %}
+<div class="loading" style="display: none;">
+    Loading...
+  </div>
+
+      </div>
+    </div>
+
+    <div class="col-md-4 mt-2">
+      <div class="card sticky-top">
+        <!-- <img src="..." class="card-img-top" alt="..."> -->
+        <!-- <div class="card-body">
+                <img src="{{profile.profile_pic.url}}" class="rounded float-left mr-4" alt="...">
+              <h5 class="card-title mt-2">{{logged_user.first_name}} {{logged_user.last_name}}</h5> <br>
+             <hr>
+        
+            </div> -->
+
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Total ideas : {{total_ideas}}</li>
+          <li class="list-group-item">Designation : {{profile.designation}}</li>
+          <li class="list-group-item">Education : {{profile.education}}</li>
+          <li class="list-group-item">Location : {{profile.location}}</li>
+        </ul>
+        {% if user.is_authenticated %}
+        {% if user == logged_user %}
+        <div class="card-body">
+
+          <a href="{% url 'accounts:update_profile' profile.user %}" class="card-link">
+            <button class="btn btn-primary btn-block"> Update profile
+            </button>
+          </a>
+
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  all_imgs = $('.card-body img');
+  all_imgs.each(function () { $(this).addClass('img-fluid') })
+</script>
+
+<script>
+
+$(document).ready(function(){
+
+  $('body').on('click','.like-btn',like_toggle_js);
+
+
+  
+})
+
+  // $('.like-btn').click(like_toggle_js);
+</script>
+<script>
+  myInfiniteScroll();
+</script>
+<!-- <script>
+
+ $( document ).ajaxComplete(function() {
+  console.log( "Triggered ajaxComplete handler." );
+  var btn = document.querySelector('.like-btn')
+btn.addEventListener('click',like_toggle_js)
+  });
+  
+  </script> -->
+{% endblock js %}

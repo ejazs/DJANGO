@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load markdown_deux_tags %}
+
+{% block content %}
+<div class="card mb-4" >
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      
+      <h4 class="card-title">{{idea.title}}</h4> 
+     
+      <p class="mt-2">
+          <b>Are you sure?</b>
+      <div class="row">
+        <div class="col-md-6">
+            <a href="{% url 'ideas:detail_view' idea.slug %}"><button type="button" class="btn btn-success btn-sm mr-2">No, Go back</button></a>
+            
+        </div>
+        <div class="col-md-6">
+            <form action="" method="post">  {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm mr-2">Yes, Delete</button>
+    </form>
+        </div>
+      </div>
+                  
+      </p>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block js %}
+<script>
+
+
+$(document).ready(function(){
+  all_imgs = $('.card-body img');
+  all_imgs.each(function(){$(this).addClass('img-fluid')});
+
+//   $("body").on('DOMSubtreeModified', "#my-preview", function() {
+//     // code here
+//     console.log('ran');
+//     all_imgs = $('.card-body img');
+//     all_imgs.each(function(){$(this).addClass('img-fluid')})
+
+// });
+});
+
+
+</script>
+{% endblock js %}

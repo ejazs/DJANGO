@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Notifications</h2>
+{% for notification in notifications %}
+
+
+<ul class="list-group mt-2">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{notification.verb|safe}}
+      <span class="badge badge-primary badge-pill">{{notification.timestamp|timesince}} ago</span>
+    </li>
+   
+  </ul>
+{% empty %}
+<h4>No new notifications</h4>
+{% endfor %}
+<div class="pagination">
+  <span class="step-links">
+      {% if notifications.has_previous %}
+          <a href="?page=1">&laquo; first</a>
+          <a href="?page={{ notifications.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+          Page {{ notifications.number }} of {{ notifications.paginator.num_pages }}.
+      </span>
+
+      {% if notifications.has_next %}
+          <a href="?page={{ notifications.next_page_number }}">next</a>
+          <a href="?page={{ notifications.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+  </span>
+</div>
+{% endblock content %}
+

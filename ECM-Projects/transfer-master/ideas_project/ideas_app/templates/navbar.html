@@ -1,0 +1,92 @@
+{% load notifications_tags %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="{% url 'ideas:dashboard' %}">ECM Ideas</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarColor02">
+    <ul class="navbar-nav mr-auto">
+      <!-- <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        
+      </li> -->
+      <!-- <li class="nav-item">
+        <a class="nav-link" href="#">Featured</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Trending</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Fresh</a>
+      </li> -->
+      <li class="nav-item">
+          <a class="nav-link" href="{% url 'ideas:ideas_list' %}">Ideas</a>
+        </li>
+      {% if user.is_authenticated %}
+    
+      {% endif %}
+      <li class="nav-item dropdown ">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+             Events
+          </a>
+          <div class="dropdown-menu" >
+            {% if user.is_authenticated and user.is_staff %}
+            <a class="dropdown-item" href="{% url 'event:create_event' %}">Create Event</a>
+            
+           
+            <!-- <a class="dropdown-item" href="#">Something else here</a> -->
+            
+            {% endif %}
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'event:list_events' %}">Events</a>
+            <a class="dropdown-item" href="{% url 'event:past_events' %}">Past Events</a>
+            <a class="dropdown-item" href="{% url 'event:upcoming_events' %}">Upcoming Events</a>
+            
+            <!-- <a class="dropdown-item" href="#">Register</a> -->
+          </div>
+        </li>
+    </ul>
+
+  
+    <!-- <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+    </form> -->
+    <ul class="navbar-nav ml-auto" style="padding-right: 30px;">
+        {% if user.is_authenticated %}
+      <li class="nav-item">
+          {% notifications_unread as unread_count %}
+        <a class="nav-link" href="{% url 'ideas:notifications' %}" {% if unread_count %} style="color: #ffeb3b;" {% endif %}>
+         
+      
+      {% if unread_count %}
+          <strong >{{ unread_count }}</strong>
+      
+      {% endif %}
+          <i class="fa fa-bell-o" aria-hidden="true"></i>Notification
+
+        </a>
+      </li>
+      {% endif %}
+        <li class="nav-item dropdown ">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                {% if user.is_authenticated %} {{user.first_name}} {{user.last_name}} {% else %} Account{% endif %}
+            </a>
+            <div class="dropdown-menu" >
+              {% if user.is_authenticated %}
+              <a class="dropdown-item" href="{% url 'accounts:profile' user %}">Profile</a>
+             
+              <!-- <a class="dropdown-item" href="#">Something else here</a> -->
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{% url 'ideas:logout' %}">Logout</a>
+              {% else %}
+              <a class="dropdown-item" href="{% url 'ideas:login_view' %}?next=/">Login</a>
+              {% endif %}
+              <!-- <a class="dropdown-item" href="#">Register</a> -->
+            </div>
+          </li>
+    </ul>
+  </div>
+</nav>

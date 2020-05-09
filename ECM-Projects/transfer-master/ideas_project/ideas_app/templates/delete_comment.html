@@ -1,0 +1,58 @@
+{% extends 'base2.html' %}
+{% load crispy_forms_tags %}
+{% load markdown_deux_tags %}
+{% block title %}
+{{ form.media }}
+<title>
+  Ideas | Create
+</title>
+{% endblock title %}
+
+{% block content %}
+<!-- <h2>Create Idea</h2> -->
+<div class="container">
+    <div class="row">
+ 
+        <div class="col-md-12">
+            <h2><small class="text-muted">Delete comment from : 
+              {{comment.idea}} ?
+            </small></h2>
+          <form action="" method="post"> {% csrf_token %}
+       
+            <span>
+                <button type="submit" class="btn btn-outline-danger  btn-block">Yes, Delete comment</button>
+                
+            </span>
+          </form>
+          <a href="{% url 'ideas:detail_view' comment.idea.slug %}"><button type="submit" class="btn btn-outline-primary  btn-block">No, Go back</button></a>
+        </div>
+      </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script>
+
+$(document).ready(function(){
+  $("#wmd-preview-id_description").appendTo("#my-preview");
+})
+
+
+
+</script>
+
+<script>
+$(document).ready(function(){
+  all_imgs = $('Img');
+  all_imgs.each(function(){$(this).addClass('img-fluid')});
+
+  $("body").on('DOMSubtreeModified', "#my-preview", function() {
+    // code here
+    console.log('ran');
+    all_imgs = $('img');
+    all_imgs.each(function(){$(this).addClass('img-fluid')})
+
+});
+})
+</script>
+{% endblock js %}

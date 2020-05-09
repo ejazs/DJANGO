@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load markdown_deux_tags %}
+
+{% block content %}
+<div class="card mb-4" >
+    <textarea name="sharelink" id="sharelink" style="display: none;">https://{{ request.META.HTTP_HOST }}{{ idea.get_absolute_url }}</textarea>
+
+    <!-- <img src="..." class="card-img-top" alt="..."> -->
+    <div class="card-body">
+      <h4 class="card-title">{{idea.title}}</h4> 
+      <span>
+          Posted by :<a href="{% url 'accounts:profile' idea.created_by  %}">
+              {{idea.created_by.first_name}} {{idea.created_by.last_name}}</small>
+         </a> |<span class="ml-2">{{idea.created_at|timesince}} ago</span>
+         |<span class="ml-2">Event : <a href="{% url 'event:event_detail' idea.event.id %}">{{idea.event}}</a></span>
+        
+         |<a class="ml-2" href="#" id="copylink"><button class="btn bt-sm" ><i class="fa fa-clone" aria-hidden="true"></i>
+         </button>copy share link</a>
+           
+           
+          
+          <hr>
+          {% if not comments_closed %}
+        <p>
+            {% if user.is_authenticated %}
+            {% if user not in idea.likes.all %}
+            <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2">
+              <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+              <span class="like-count">{{idea.likes.count}}</span>
+            </a>
+      
+            {% else %}
+            <a href="#" data-href="{{idea.get_like_api_url}}" class="like-btn mr-2" style="color: #2196f3;">
+              <i class="fa fa-thumbs-up mr-2" aria-hidden="true" >Liked</i>
+              <span class="like-count">{{idea.likes.count}}</span>
+            </a>
+      
+            {% endif %} 
+            {% else %}
+            <a href="{% url 'ideas:like' idea.slug %}"  >
+                <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+                <span class="like-count">{{idea.likes.count}}</span>
+              </a>
+            {% endif %} 
+          
+        </p>
+        {% else %}
+        <p>
+            {% if user.is_authenticated %}
+            {% if user not in idea.likes.all %}
+          
+              <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+              <span class="like-count">{{idea.likes.count}}</span>
+      
+            {% else %}
+              <i class="fa fa-thumbs-up mr-2" aria-hidden="true" >Liked</i>
+              <span class="like-count">{{idea.likes.count}}</span>
+      
+            {% endif %} 
+            {% else %}
+                <i class="fa fa-thumbs-up mr-2" aria-hidden="true">Like</i>
+                <span class="like-count">{{idea.likes.count}}</span>
+            {% endif %} 
+          
+        </p>
+        {% endif %}
+      </span> 
+      {% if user.is_authenticated %}
+      {% if idea.created_by == user %}
+      <p class="mt-2">
+          <a href="{% url 'ideas:update_idea' idea.slug %}"><button type="button" class="btn btn-success btn-sm mr-2">Update</button></a>
+          <a href="{% url 'ideas:delete_idea' idea.slug %}"><button type="button" class="btn btn-danger btn-sm mr-2">Delete</button></a>
+          
+      </p>
+      {% endif %}
+      {% endif %}
+      <hr>
+      <p class="card-text">{{idea.description|markdown }}</p>
+    </div>
+  </div>
+
+  <!-- COMMENTS STRATS HERE -->
+  {% if user.is_authenticated %} 
+  {% if not comments_closed %}
+  <form action="" method="post"> {% csrf_token %}
+    {{form|crispy}}
+    <button type="submit" class="btn btn-primary btn-block">Comment</button>    
+  </form>
+  {% else %}
+  <strong>Comments are closed for this idea</strong>
+  {% endif %}
+  {% else %}
+  <strong> Please <a href="{% url 'ideas:login_view' %}">Login</a> to add a comment</strong>
+  {% endif %}
+  <hr>
+  <h4 class="mt-2 ml-2">Comments</h4>
+  <hr>
+  {% for comment in comments %}
+  <div class="card mb-4" >
+   
+   
+  
+  <div class="media  mt-2 " style="word-break: break-all;">
+    
+    <img src="{{comment.user.userprofile.profile_pic.url}}" class="mr-3" alt="...">
+    <div class="media-body">
+      <!-- <h5 class="mt-0">Media heading</h5> -->
+     
+      <blockquote class="blockquote">
+        
+          <p class="mb-0" > {{comment.comment|linebreaks}}</p>
+          <small class="mr-4">
+              By <a href="{% url 'accounts:profile' comment.user %}" class="mr-2">
+                <cite title="Source Title">{{comment.user.first_name }} {{comment.user.last_name }}
+                
+                </cite>
+              </a>|
+              <span class="ml-2">at : {{comment.created_at}}</span> <br>
+
+              
+             </small>
+          {% if user.is_authenticated %}
+          {% if comment.user == user %}
+          <small><a href="{% url 'ideas:update_comment'  comment.idea.slug comment.id %}">
+            <button class="btn btn-success btn-sm">Update</button>
+          </a></small>
+          <small><a href="{% url 'ideas:delete_comment' comment.id %}">
+              <button class="btn btn-danger btn-sm">Delete</button>
+            </a></small>
+          {% endif %}
+          {% endif %}
+          
+        
+      
+    </div>
+    
+  </div>
+
+</div>
+{% empty %}
+    <h6>Be first one to comment</h6>
+{% endfor %}
+{% endblock content %}
+
+{% block js %}
+<script>
+
+
+$(document).ready(function(){
+  all_imgs = $('.card-body img');
+  all_imgs.each(function(){$(this).addClass('img-fluid')});
+
+//   $("body").on('DOMSubtreeModified', "#my-preview", function() {
+//     // code here
+//     console.log('ran');
+//     all_imgs = $('.card-body img');
+//     all_imgs.each(function(){$(this).addClass('img-fluid')})
+
+// });
+});
+
+
+</script>
+<script>
+  $('.like-btn').click(like_toggle_js);
+</script>
+
+{% if comment %}
+<script>
+$(document).ready(function () {
+    // Handler for .ready() called.
+    $('html, body').animate({
+        scrollTop: $('#div_id_comment').offset().top
+    }, 'fast');
+});
+</script>
+
+
+
+{% endif %}
+<script>
+    // for share link
+    $(document).ready(function(){
+      console.log('ready')
+      $('#copylink').click(function(e){
+      e.preventDefault()
+      let textarea = document.createElement('textarea');
+textarea.setAttribute('type', 'hidden');
+textarea.textContent = $('#sharelink').val(); //'the string you want to copy';
+document.body.appendChild(textarea);
+textarea.select();
+document.execCommand('copy');
+textarea.remove()
+    console.log('copied')
+    })
+    })
+    </script>
+{% endblock js %}

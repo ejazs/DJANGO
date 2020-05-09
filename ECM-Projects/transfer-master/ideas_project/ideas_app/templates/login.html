@@ -1,0 +1,70 @@
+{% extends "base2.html" %}
+
+{% load i18n static %}
+{% comment %}
+Example non-admin login form, modified from the main example Django login
+template example:
+https://docs.djangoproject.com/en/2.1/topics/auth/default/#all-authentication-views
+{% endcomment %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'microsoft/css/login.css' %}" />
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div id="content-main mt-4">
+
+  {% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
+
+  {% if next %}
+      {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+      {% else %}
+      <p>Please login to see this page.</p>
+      {% endif %}
+  {% endif %}
+
+  {% if microsoft_login_enabled %}
+
+  <div class="center mt-4">
+      <div class="container mt-4">
+          <h4>Please login to continue</h4>
+          <i class="fa fa-windows" aria-hidden="true"></i>
+
+          <button id="microsoft-login" class="btn btn-info  btn-lg btn-block" type="button">
+            
+              <i class="fa fa-windows">Login with {{ microsoft_login_type_text }} Office 365</i> 
+          </button>
+      </div>
+      <button id="password-login" class="btn btn-success" type="button" style="display: none;">{% trans 'Password' %}</button>
+      <!-- <h3>Welcome Guest</h3> -->
+   
+  </div>
+  {% endif %}
+
+  <div id="login-container" class="{% if microsoft_login_enabled %}hide{% endif %}">
+  
+  </div>
+
+  {# Assumes you setup the password_reset view in your URLconf #}
+</div>
+{% endblock %}
+
+{% block js %}
+  {% if microsoft_login_enabled %}
+    <script type="text/javascript" src="{% static 'microsoft/js/login.js' %}"></script>
+    <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded",
+                              function(event) {
+                                window.microsoft.login = new window.microsoft.objects.LoginController({
+                                  'authorization_url': '{{ microsoft_authorization_url }}'
+                                });
+                              });
+    </script>
+  {% endif %}
+{% endblock %}

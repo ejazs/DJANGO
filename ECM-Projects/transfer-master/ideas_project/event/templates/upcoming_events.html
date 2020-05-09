@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="infinite-container">
+    <form class="mb-2" method="GET" >
+        <div class="form-group">
+          <input type="text" class="form-control" id="seacrh" name="q" placeholder="Search Events" value="{{request.GET.q}}">
+        </div>
+      
+        <button type="submit" class="btn btn-info btn-block">Search</button>
+      </form>
+      <hr>
+{% for event in events %}
+
+<div class="card text-white bg-dark mb-3 infinite-item" >
+    <!-- <div class="card-header">Header</div> -->
+    <div class="card-body">
+        <h4 class="card-title">{{event.title}}</h4>
+    
+     
+      <span>
+          <span class="card-text mr-2">Organized by : {{event.organiser}}</span> |
+          <span class="card-text mr-2">Starting on : {{event.start_date}}</span> |
+          <span class="card-text ml-2">Ending on : {{event.end_date}}</span>
+      </span>
+    </div>
+    <a href="{{event.get_absolute_url}}">
+         <button class="btn btn-primary btn-block">View details</button>
+      </a>
+  </div>
+
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {% if events.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ events.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ events.number }} of {{ events.paginator.num_pages }}.
+        </span>
+
+        {% if events.has_next %}
+            <a href="?page={{ events.next_page_number }}">next</a>
+            <a href="?page={{ events.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+{% endblock %}
+
